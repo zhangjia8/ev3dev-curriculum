@@ -24,6 +24,8 @@ class Snatch3r(object):
         self.right_motor = ev3.LargeMotor(ev3.OUTPUT_C)
 
     def drive_inches(self, inches_target, speed_deg_per_second):
+        """Drives in inches given an amount of inches to drive and how fast in degrees per second."""
+
         # Check that the motors are actually connected
         assert self.left_motor.connected
         assert self.right_motor.connected
@@ -36,7 +38,7 @@ class Snatch3r(object):
         self.left_motor.wait_while(ev3.Motor.STATE_RUNNING)
 
     def turn_degrees(self, degrees_to_turn, turn_speed_sp):
-
+        """Turing robot given in degrees to turn and speed to turn in degrees per second"""
         assert self.left_motor.connected
         assert self.right_motor.connected
 
