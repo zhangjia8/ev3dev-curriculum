@@ -5,9 +5,9 @@ The team should work together and pick one team member to type code into libs/ro
 constructor and a method called drive_inches.
 
 Authors: David Fisher and Jiatong Zhang.
-"""  # TODO: 1. PUT YOUR NAME IN THE ABOVE LINE.
+"""  # DONE: 1. PUT YOUR NAME IN THE ABOVE LINE.
 
-# TODO: 2. On your computer right click on the libs folder in PyCharm, select Mark Directory as... Sources Root
+# DONE: 2. On your computer right click on the libs folder in PyCharm, select Mark Directory as... Sources Root
 #   That should fix the error on the import robot_controller as robo line below (expand the imports below)
 #   Marking that folder as a Source Root will allow any module in that folder to be used globally in this project.
 #   Note, when that folder is uploaded to the EV3, it wil be in the folder /home/robot/csse120/libs
