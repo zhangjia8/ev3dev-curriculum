@@ -28,7 +28,6 @@ def main():
         # Tip for later, try a negative value for Number of sides: to drive CW around the polygon instead of CCW.
         if sides == 0:
             break
-        turn_amount = 360 / sides
 
         edge_length_in = int(input("Length of each edge (inches): "))
         if edge_length_in == 0:
