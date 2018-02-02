@@ -90,7 +90,7 @@ class Snatch3r(object):
         self.arm_motor.stop(stop_action="brake")
         ev3.Sound.beep().wait()
 
-    def srm_down(self):
+    def arm_down(self):
         """Moves the Snatch3r arm to the down position."""
         self.arm_motor.run_to_abs_pos(position_sp=0)
         self.arm_motor.wait_while(ev3.Motor.STATE_RUNNING)  # Blocks until the motor finishes running
