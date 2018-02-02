@@ -94,6 +94,7 @@ def handle_up_button(button_state):
     """Handle IR / button event."""
     if button_state:
         print("Up button is pressed")
+        play_song_by_individual_tones()
     else:
         print("Up button was released")
 
@@ -102,6 +103,7 @@ def handle_down_button(button_state):
     """Handle IR / button event."""
     if button_state:
         print("Down button is pressed")
+        play_song_by_notes_list()
     else:
         print("Down button was released")
 
@@ -110,6 +112,7 @@ def handle_left_button(button_state):
     """Handle IR / button event."""
     if button_state:
         print("Left button is pressed")
+        speak()
     else:
         print("Left button was released")
 
@@ -118,6 +121,7 @@ def handle_right_button(button_state):
     """Handle IR / button event."""
     if button_state:
         print("Right button is pressed")
+        play_wav_file()
     else:
         print("Right button was released")
 
@@ -143,7 +147,7 @@ def handle_shutdown(button_state, dc):
 
 
 
-# TODO: 7. Call over a TA or instructor to sign your team's checkoff sheet and do a code review.
+# DONE: 7. Call over a TA or instructor to sign your team's checkoff sheet and do a code review.
 #
 # Observations you should make, button events are better because you get called only once per press, however, callbacks
 #   make it a bit tricker to pass data around (which is why we used the DataContainer object).
