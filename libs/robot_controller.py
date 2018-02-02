@@ -76,4 +76,9 @@ class Snatch3r(object):
 
         self.arm_motor.position = 0  # Calibrate the down position as 0 (this line is correct as is).
 
-        
+    def arm_up(self):
+        arm_motor.run_to_rel_pos(position_sp=14.2 * 360, speed_sp=MAX_SPEED)
+        while not touch_sensor.is_pressed:
+            time.sleep(0.01)
+        arm_motor.stop(stop_action="brake")
+        ev3.Sound.beep().wait()
