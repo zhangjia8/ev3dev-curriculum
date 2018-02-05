@@ -34,7 +34,6 @@ import time
 import robot_controller as robo
 
 robot = robo.Snatch3r()
-
 # Note that todo2 is farther down in the code.  That method needs to be written before you do todo3.
 # DONE: 3. Have someone on your team run this program on the EV3 and make sure everyone understands the code.
 # Can you see what the robot does and explain what each line of code is doing? Talk as a group to make sure.
@@ -57,7 +56,7 @@ def main():
     ev3.Sound.speak("I R Remote")
 
     ev3.Leds.all_off()  # Turn the leds off
-    robot = robo.Snatch3r()
+
     dc = DataContainer()
 
     # DONE: 4. Add the necessary IR handler callbacks as per the instructions above.
@@ -72,7 +71,7 @@ def main():
 
     rc1 = ev3.RemoteControl(channel=1)
 
-    rc1.on_red_up = lambda state: handle_red_up_1(state,dc)
+    rc1.on_red_up = lambda state: handle_red_up_1(state, dc)
     rc1.on_red_down = lambda state: handle_red_down_1(state, dc)
     rc1.on_blue_up = lambda state: handle_blue_up_1(state, dc)
     rc1.on_blue_down = lambda state: handle_blue_down_1(state, dc)
@@ -82,10 +81,6 @@ def main():
     rc2.on_red_up = lambda state: handle_red_up_2(state, dc)
     rc2.on_red_down = lambda state: handle_red_down_2(state, dc)
     rc2.on_blue_up = lambda state: handle_blue_up_2(state, dc)
-
-
-
-
 
     while dc.running:
         # DONE: 5. Process the RemoteControl objects.
@@ -118,32 +113,39 @@ def handle_red_up_1(button_state, dc):
     if button_state:
         robot.left_motor.run_forever(speed_sp=600)
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.GREEN)
-        time.sleep(.5)
+
+    else:
         robot.left_motor.stop()
+        ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.BLACK)
 
 
 def handle_red_down_1(button_state, dc):
     if button_state:
         robot.left_motor.run_forever(speed_sp=-600)
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.RED)
-        time.sleep(.5)
+
+    else:
         robot.left_motor.stop()
+        ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.BLACK)
 
 
 def handle_blue_up_1(button_state, dc):
     if button_state:
         robot.right_motor.run_forever(speed_sp=600)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.GREEN)
-        time.sleep(.5)
+    else:
         robot.right_motor.stop()
+        ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.BLACK)
 
 
 def handle_blue_down_1(button_state, dc):
     if button_state:
         robot.right_motor.run_forever(speed_sp=-600)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.RED)
-        time.sleep(.5)
+
+    else:
         robot.right_motor.stop()
+        ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.BLACK)
 
 
 def handle_red_up_2(button_state, dc):
@@ -159,6 +161,7 @@ def handle_red_down_2(button_state, dc):
 def handle_blue_up_2(button_state, dc):
     if button_state:
         robot.arm_calibration()
+
 
 def handle_arm_up_button(button_state, robot):
     """
@@ -210,4 +213,6 @@ def handle_shutdown(button_state, dc):
 # ----------------------------------------------------------------------
 # Calls  main  to start the ball rolling.
 # ----------------------------------------------------------------------
+
+
 main()
