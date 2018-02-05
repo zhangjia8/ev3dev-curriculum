@@ -35,6 +35,7 @@ def main():
     # DONE: 2. Setup an mqtt_client.  Notice that since you don't need to receive any messages you do NOT need to have
     # a MyDelegate class.  Simply construct the MqttClient with no parameter in the constructor (easy).
     mqtt_client = com.MqttClient()
+    mqtt_client.connect_to_ev3()
 
     root = tkinter.Tk()
     root.title("MQTT Remote")
@@ -126,22 +127,22 @@ def main():
 
 def send_forward(mqtt_client, left_speed_entry, right_speed_entry):
     print("Forward")
-    mqtt_client.send_message("drive_forever", [left_speed_entry.get(), right_speed_entry.get()])
+    mqtt_client.send_message("drive_forever", [int(left_speed_entry.get()), int(right_speed_entry.get())])
 
 
 def send_left(mqtt_client, left_speed_entry, right_speed_entry):
     print("Left")
-    mqtt_client.send_message("drive_forever", [-left_speed_entry.get(), right_speed_entry.get()])
+    mqtt_client.send_message("drive_forever", [-int(left_speed_entry.get()), int(right_speed_entry.get())])
 
 
 def send_right(mqtt_client, left_speed_entry, right_speed_entry):
     print("Right")
-    mqtt_client.send_message("drive_forever", [left_speed_entry.get(), -right_speed_entry.get()])
+    mqtt_client.send_message("drive_forever", [int(left_speed_entry.get()), -int(right_speed_entry.get())])
 
 
 def send_back(mqtt_client, left_speed_entry, right_speed_entry):
     print("Back")
-    mqtt_client.send_message("drive_forever", [-left_speed_entry.get(), -right_speed_entry.get()])
+    mqtt_client.send_message("drive_forever", [-int(left_speed_entry.get()), -int(right_speed_entry.get())])
 
 
 def send_stop(mqtt_client):
