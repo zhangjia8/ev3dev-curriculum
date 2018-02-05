@@ -110,3 +110,7 @@ class Snatch3r(object):
     def loop_forever(self):
         while self.running:
             time.sleep(0.1)
+
+    def drive_forever(self, left_speed_entry, right_speed_entry):
+        self.left_motor.run_forever(speed_sp=left_speed_entry)
+        self.right_motor.run_forever(speed_sp=right_speed_entry)
