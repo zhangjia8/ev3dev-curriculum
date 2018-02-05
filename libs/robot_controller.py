@@ -25,6 +25,7 @@ class Snatch3r(object):
         self.arm_motor = ev3.MediumMotor(ev3.OUTPUT_A)
         self.touch_sensor = ev3.TouchSensor()
         self.MAX_SPEED = 900
+        self.running = True
 
     def drive_inches(self, inches_target, speed_deg_per_second):
         """Drives in inches given an amount of inches to drive and how fast in degrees per second."""
@@ -102,5 +103,10 @@ class Snatch3r(object):
         self.arm_motor.stop()
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.GREEN)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.GREEN)
+        self.running = False
         print("Goodbye!")
         ev3.Sound.speak("Goodbye").wait()
+
+    def loop_forever(self):
+        while self.running:
+            time.sleep(0.1)
