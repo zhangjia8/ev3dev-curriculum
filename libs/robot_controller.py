@@ -23,16 +23,25 @@ class Snatch3r(object):
         self.left_motor = ev3.LargeMotor(ev3.OUTPUT_B)
         self.right_motor = ev3.LargeMotor(ev3.OUTPUT_C)
         self.arm_motor = ev3.MediumMotor(ev3.OUTPUT_A)
+
         self.touch_sensor = ev3.TouchSensor()
+        self.pixy = ev3.Sensor(driver_name="pixy-lego")
+        self.color_sensor = ev3.ColorSensor
+        self.ir_sensor = ev3.InfraredSensor
+
         self.MAX_SPEED = 900
         self.running = True
-
-    def drive_inches(self, inches_target, speed_deg_per_second):
-        """Drives in inches given an amount of inches to drive and how fast in degrees per second."""
 
         # Check that the motors are actually connected
         assert self.left_motor.connected
         assert self.right_motor.connected
+        assert self.touch_sensor
+        assert self.pixy
+        assert self.color_sensor
+        assert self.ir_sensor
+
+    def drive_inches(self, inches_target, speed_deg_per_second):
+        """Drives in inches given an amount of inches to drive and how fast in degrees per second."""
 
         inches = inches_target
         speed = speed_deg_per_second
@@ -45,8 +54,6 @@ class Snatch3r(object):
 
     def turn_degrees(self, degrees_to_turn, turn_speed_sp):
         """Turing robot given in degrees to turn and speed to turn in degrees per second"""
-        assert self.left_motor.connected
-        assert self.right_motor.connected
 
         degrees = degrees_to_turn * 4.5
         speed = turn_speed_sp
@@ -98,6 +105,7 @@ class Snatch3r(object):
         ev3.Sound.beep().wait()
 
     def shutdown(self):
+        """"Shut down the robot"""
         self.left_motor.stop()
         self.right_motor.stop()
         self.arm_motor.stop()
@@ -108,5 +116,11 @@ class Snatch3r(object):
         ev3.Sound.speak("Goodbye").wait()
 
     def loop_forever(self):
+        """Make an infinite loop while the running"""
         while self.running:
             time.sleep(0.1)
+
+    def drive_forever(self, left_speed_entry, right_speed_entry):
+        """Drive forever"""
+        self.left_motor.run_forever(speed_sp=left_speed_entry)
+        self.right_motor.run_forever(speed_sp=right_speed_entry)
