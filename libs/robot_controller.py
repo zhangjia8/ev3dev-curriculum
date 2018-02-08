@@ -123,6 +123,9 @@ class Snatch3r(object):
         self.left_motor.run_forever(speed_sp=left_speed_entry)
         self.right_motor.run_forever(speed_sp=right_speed_entry)
 
+    def stop(self):
+        self.drive_forever(0, 0)
+
     def seek_beacon(self):
         """seek the beacon"""
         beacon_seeker = ev3.BeaconSeeker(channel=1)
@@ -147,7 +150,7 @@ class Snatch3r(object):
                     # You add more!
                     if beacon_seeker.distance == 0:
                         print(" you have found the beacon")
-                        self.drive_forever(0, 0)
+                        self.stop()
                         return True
                     else:
                         self.drive_forever(forward_speed, forward_speed)
@@ -155,7 +158,7 @@ class Snatch3r(object):
                     if current_heading < 0:
                         self.drive_forever(-turn_speed, turn_speed)
                         print("Adjusting heading: ", current_heading)
-                    else:
+                    elif current_heading > 0:
                         self.drive_forever(turn_speed, -turn_speed)
                         print("Adjusting heading: ", current_heading)
                 elif math.fabs(current_heading) > 10:

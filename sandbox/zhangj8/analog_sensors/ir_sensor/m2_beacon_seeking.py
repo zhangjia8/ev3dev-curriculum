@@ -106,18 +106,18 @@ def seek_beacon(robot):
                 if current_heading < 0:
                     robot.drive_forever(-turn_speed, turn_speed)
                     print("Adjusting heading: ", current_heading)
-                else:
+                elif current_heading > 0:
                     robot.drive_forever(turn_speed, -turn_speed)
                     print("Adjusting heading: ", current_heading)
             elif math.fabs(current_heading) > 10:
-                robot.drive_forever(0, 0)
+                robot.stop()
                 print("Heading is too far off to fix: ", current_heading)
 
         time.sleep(0.2)
 
     # The touch_sensor was pressed to abort the attempt if this code runs.
     print("Abandon ship!")
-    robot.shutdown()
+    robot.stop()
     return False
 
     # DONE: 6. Demo your program by putting the beacon within a few feet of the robot, within 30 degrees of straight in
