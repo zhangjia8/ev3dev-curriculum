@@ -1,16 +1,21 @@
 import ev3dev.ev3 as ev3
 import time
+import math
 import tkinter
 from tkinter import ttk
 import robot_controller as robo
 import mqtt_remote_method_calls as com
 
 
+xvalue = 0
+yvalue = 0
+
+
 def main():
     mqtt_client = None
 
     root = tkinter.Tk()
-    root.title("MQTT Remote")
+    root.title("Bomb Squad")
 
     main_frame = ttk.Frame(root, padding=20, relief='raised')
     main_frame.grid()
@@ -20,7 +25,7 @@ def main():
     canvas.grid(row=1, column=2)
 
     # Make callbacks for mouse click events.
-    canvas.bind("<Button-1>", lambda event: left_mouse_click(event, mqtt_client))
+    canvas.bind("<Button-1>", lambda event: clicked(event, mqtt_client, 500))
 
     quit_button = ttk.Button(main_frame, text="Quit")
     quit_button.grid(row=1, column=3)
@@ -30,7 +35,7 @@ def main():
     mqtt_client = com.MqttClient(my_delegate)
     mqtt_client.connect("draw", "draw")
 
-    bomb_squad = ttk.Label(main_frame, text="Bomb Squad!")
+    bomb_squad = ttk.Label(main_frame, text="Find Some Bombs!")
     bomb_squad.grid(row=0, column=2)
 
     root.mainloop()
@@ -46,12 +51,31 @@ def send_down(mqtt_client):
     mqtt_client.send_message("arm_down")
 
 
-def left_mouse_click(event, mqtt_client):
-    """ Draws a circle onto the canvas (one way or another). """
+def clicked(event, mqtt_client, speed):
     print("You clicked location ({},{})".format(event.x, event.y))
     my_color = "green"  # Make your color unique
-
     mqtt_client.send_message("on_circle_draw", [my_color, event.x, event.y])
+
+    x = math.fabs(event.x - 400)
+    y = math.fabs(event.y - 250)
+    distance = math.sqrt(x**2 + y**2)
+    angle = math.tan(y/x)
+
+    # Upper Right Quadrant
+    if event.x >= 400 & event.y <= 250:
+        degrees = 90 - angle
+    # Upper Left Quadrant
+    if event.x <= 400 & event.y <= 250:
+        degrees = -(90-angle)
+    # Lower Right Quadrant
+    if event.x >= 400 & event.y >= 250:
+        degrees = 90 + angle
+    # Lower Left Quadrant
+    if event.x <= 400 & event.y >= 250:
+        degrees = -(90 + angle)
+
+    mqtt_client.send_message("turn_degrees", [degrees, speed])
+    mqtt_client.send_message("drive_inches", [distance, speed])
 
 
 def clear(canvas):
