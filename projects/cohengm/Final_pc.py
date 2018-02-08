@@ -1,9 +1,9 @@
-import ev3dev.ev3 as ev3
-import time
+# import ev3dev.ev3 as ev3
+# import time
 import math
 import tkinter
 from tkinter import ttk
-import robot_controller as robo
+# import robot_controller as robo
 import mqtt_remote_method_calls as com
 
 
@@ -60,6 +60,7 @@ def clicked(event, mqtt_client, speed):
     y = math.fabs(event.y - 250)
     distance = math.sqrt(x**2 + y**2)
     angle = math.tan(y/x)
+    degrees = 0
 
     # Upper Right Quadrant
     if event.x >= 400 & event.y <= 250:
