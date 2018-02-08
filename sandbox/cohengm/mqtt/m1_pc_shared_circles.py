@@ -119,7 +119,7 @@ def left_mouse_click(event, mqtt_client):
     # You should be able to see circles on your computer from everyone else on your team.
     # Try to draw the first letter of your name in circles. :)
 
-    # TODO: 9. Call over a TA or instructor to sign your team's checkoff sheet.
+    # DONE: 9. Call over a TA or instructor to sign your team's checkoff sheet.
     #
     # Observations you should make, with MQTT your team can hear your messages.
     # You published messages to the "legoXX/draw" topic (where XX is the number set in libs/mqtt_remote_method_calls.py)
