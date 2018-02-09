@@ -1,5 +1,5 @@
 # import ev3dev.ev3 as ev3
-import time
+# import time
 import math
 import tkinter
 from tkinter import ttk
@@ -7,13 +7,9 @@ from tkinter import ttk
 import mqtt_remote_method_calls as com
 
 
-xvalue = 0
-yvalue = 0
-
-
 def main():
     mqtt_client = com.MqttClient()
-    mqtt_client.connect_to_ev3(lego_robot_number=9)
+    mqtt_client.connect_to_ev3()
 
     root = tkinter.Tk()
     root.title("Bomb Squad")
@@ -25,8 +21,10 @@ def main():
     canvas = tkinter.Canvas(main_frame, background="lightgray", width=800, height=500)
     canvas.grid(row=1, column=2)
 
+    canvas.create_oval(390, 240, 410, 260, fill="red", width=3)
+
     # Make callbacks for mouse click events.
-    canvas.bind("<Button-1>", lambda event: clicked(event, mqtt_client, 500))
+    canvas.bind("<Button-1>", lambda event: clicked(event, canvas, 500))
 
     quit_button = ttk.Button(main_frame, text="Quit")
     quit_button.grid(row=1, column=3)
@@ -42,44 +40,46 @@ def main():
     root.mainloop()
 
 
-def send_up(mqtt_client):
-    print("arm_up")
-    mqtt_client.send_message("arm_up")
+def clicked(event, canvas, speed):
 
+    my_delegate = MyDelegate(canvas)
+    mqtt_client = com.MqttClient(my_delegate)
+    mqtt_client.connect("draw", "draw")
 
-def send_down(mqtt_client):
-    print("arm_down")
-    mqtt_client.send_message("arm_down")
-
-
-def clicked(event, mqtt_client, speed):
     print("You clicked location ({},{})".format(event.x, event.y))
-    my_color = "green"  # Make your color unique
+    my_color = "green"  # Color of circle
     mqtt_client.send_message("on_circle_draw", [my_color, event.x, event.y])
 
-    x = math.fabs(event.x - 400)
-    y = math.fabs(event.y - 250)
-    distance = math.sqrt(x**2 + y**2)/10
-    angle = math.tan(y/x)
-    degrees = 0
+    mqtt_client = com.MqttClient()
+    mqtt_client.connect_to_ev3()
+
+    x = math.fabs(event.x - my_delegate.eventxold)
+    y = math.fabs(event.y - my_delegate.eventyold)
+    # distance = math.sqrt(x**2 + y**2)/10
+    angle = math.tan(y/x)*180/math.pi
+    degrees = 10
 
     # Upper Right Quadrant
-    if event.x >= 400 & event.y <= 250:
-        degrees = 90 - angle
-    # Upper Left Quadrant
-    if event.x <= 400 & event.y <= 250:
-        degrees = -(90-angle)
-    # Lower Right Quadrant
-    if event.x >= 400 & event.y >= 250:
-        degrees = 90 + angle
-    # Lower Left Quadrant
-    if event.x <= 400 & event.y >= 250:
-        degrees = -(90 + angle)
-    print("turn_degrees")
+    if event.x >= 400 and event.y <= 250:
+        degrees = angle
+    print("Deg: ", degrees)
+    print("X: ", x)
+    print("Y: ", y)
+    # # Upper Left Quadrant
+    # if event.x <= 400 & event.y <= 250:
+    #     degrees = -(90-angle)
+    # # Lower Right Quadrant
+    # if event.x >= 400 & event.y >= 250:
+    #     degrees = 90 + angle
+    # # Lower Left Quadrant
+    # if event.x <= 400 & event.y >= 250:
+    #     degrees = -(90 + angle)
+    # print("turn_degrees")
     mqtt_client.send_message("turn_degrees", [degrees, speed])
-    time.sleep(5)
-    print("drive_inches")
-    mqtt_client.send_message("drive_inches", [distance, speed])
+    # print("drive_inches")
+    # mqtt_client.send_message("drive_inches", [distance, speed])
+    my_delegate.eventxold = event.x
+    my_delegate.eventyold = event.y
 
 
 def clear(canvas):
@@ -99,6 +99,8 @@ class MyDelegate(object):
 
     def __init__(self, canvas):
         self.canvas = canvas
+        self.eventxold = 400
+        self.eventyold = 250
 
     def on_circle_draw(self, color, x, y):
         self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=color, width=3)
