@@ -1,5 +1,5 @@
 # import ev3dev.ev3 as ev3
-# import time
+import time
 import math
 import tkinter
 from tkinter import ttk
@@ -12,7 +12,8 @@ yvalue = 0
 
 
 def main():
-    mqtt_client = None
+    mqtt_client = com.MqttClient()
+    mqtt_client.connect_to_ev3(lego_robot_number=9)
 
     root = tkinter.Tk()
     root.title("Bomb Squad")
@@ -58,7 +59,7 @@ def clicked(event, mqtt_client, speed):
 
     x = math.fabs(event.x - 400)
     y = math.fabs(event.y - 250)
-    distance = math.sqrt(x**2 + y**2)
+    distance = math.sqrt(x**2 + y**2)/10
     angle = math.tan(y/x)
     degrees = 0
 
@@ -74,8 +75,10 @@ def clicked(event, mqtt_client, speed):
     # Lower Left Quadrant
     if event.x <= 400 & event.y >= 250:
         degrees = -(90 + angle)
-
+    print("turn_degrees")
     mqtt_client.send_message("turn_degrees", [degrees, speed])
+    time.sleep(5)
+    print("drive_inches")
     mqtt_client.send_message("drive_inches", [distance, speed])
 
 
