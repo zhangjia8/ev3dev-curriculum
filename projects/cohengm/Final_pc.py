@@ -52,7 +52,7 @@ def clicked(mqtt_client, my_delegate, event, speed):
     x = math.fabs(event.x - my_delegate.eventxold)
     y = math.fabs(event.y - my_delegate.eventyold)
     distance = math.sqrt(x**2 + y**2)/10
-    angle = math.tan(y/x)*180/math.pi
+    angle = (math.tan(y/x)*180/math.pi)
     degrees = 0
 
     print("")
@@ -80,13 +80,17 @@ def clicked(mqtt_client, my_delegate, event, speed):
     # Upper Left Quadrant
     if event.x <= my_delegate.eventxold and event.y <= my_delegate.eventyold:
         turns = 1
-        degrees = angle
+        degrees = angle * turns
+    # while ev3.ColorSensor.color != "White":
     my_delegate.newpoint(event.x, event.y)
     print("Deg: ", degrees)
     mqtt_client.send_message("turn_degrees", [degrees, speed])
     print("Dis: ", distance)
     mqtt_client.send_message("drive_inches", [distance, speed])
-    mqtt_client.send_message("turn_degrees", [365 - degrees, speed])
+    mqtt_client.send_message("turn_degrees", [360 - degrees, speed])
+    # ev3.Sound.speak("Found BOMB").wait()
+    # mqtt_client.send_message("drive_inches", [0, 0])
+    # mqtt_client.send_message("turn_degrees", [360 - degrees, speed])
 
 
 def clear(canvas):
