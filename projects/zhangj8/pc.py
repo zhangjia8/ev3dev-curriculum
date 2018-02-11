@@ -22,11 +22,15 @@ def main():
     main_frame = ttk.Frame(root, padding=5)
     main_frame.grid()
 
+    instructions = "This is what I saw"
+    label = ttk.Label(main_frame, text=instructions)
+    label.grid(columnspan=2)
+
     # The values from the Pixy range from 0 to 319 for the x and 0 to 199 for the y.
-    canvas = tkinter.Canvas(main_frame, background="lightgray", width=800, height=400)
+    canvas = tkinter.Canvas(main_frame, background="lightgray", width=320, height=200)
     canvas.grid(columnspan=2)
 
-    rect_tag = canvas.create_rectangle(410, 190, 390, 210, fill="black")
+    rect_tag = canvas.create_rectangle(155, 95, 165, 105, fill="lightgray")
 
     # Buttons for quit and exit
     quit_button = ttk.Button(main_frame, text="Quit")
