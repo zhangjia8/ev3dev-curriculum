@@ -52,7 +52,7 @@ def main():
     ev3.Sound.speak("Goodbye").wait()
     mqtt_client.close()
 
-# TODO: 5. Call over a TA or instructor to sign your team's checkoff sheet.
+# DONE: 5. Call over a TA or instructor to sign your team's checkoff sheet.
 #
 # Observations you should make, if the EV3 has data the PC can know that data too using MQTT.
 
@@ -61,4 +61,3 @@ def main():
 # Calls  main  to start the ball rolling.
 # ----------------------------------------------------------------------
 main()
-
