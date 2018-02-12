@@ -52,7 +52,6 @@ def clicked(mqtt_client, my_delegate, event, speed):
     x = math.fabs(event.x - my_delegate.eventxold)
     y = math.fabs(event.y - my_delegate.eventyold)
     distance = math.sqrt(x**2 + y**2)/10
-    angle = (math.tan(y/x)*180/math.pi)
     degrees = 0
 
     print("")
@@ -65,28 +64,33 @@ def clicked(mqtt_client, my_delegate, event, speed):
 
     # Upper Right Quadrant
     if event.x >= my_delegate.eventxold and event.y <= my_delegate.eventyold:
+        angle = math.fabs((math.tan(y / x) * 180 / math.pi))
         turns = 3
         degrees = angle + 90*turns
     # Lower Right Quadrant
     if event.x >= my_delegate.eventxold and event.y >= my_delegate.eventyold:
+        angle = math.fabs((math.tan(x / y) * 180 / math.pi))
         turns = 2
         degrees = angle + 90*turns
     # Lower Left Quadrant
     if event.x <= my_delegate.eventxold and event.y >= my_delegate.eventyold:
+        angle = math.fabs((math.tan(y / x) * 180 / math.pi))
         turns = 1
-        degrees = math.fabs(angle + 90 * turns)
+        degrees = angle + 90 * turns
     # Upper Left Quadrant
     if event.x <= my_delegate.eventxold and event.y <= my_delegate.eventyold:
-        turns = 1
-        degrees = angle * turns
+        angle = math.fabs((math.tan(x / y) * 180 / math.pi))
+        turns = 0
+        degrees = angle + 90 * turns
     # while ev3.ColorSensor.color != "White":
     my_delegate.newpoint(event.x, event.y)
+    # while my_delegate.bomb == 0:
+    print("Turns: ", turns)
     print("Deg: ", degrees)
     mqtt_client.send_message("turn_degrees", [degrees, speed])
     print("Dis: ", distance)
     mqtt_client.send_message("drive_inches", [distance, speed])
     mqtt_client.send_message("turn_degrees", [360 - degrees, speed])
-    # ev3.Sound.speak("Found BOMB").wait()
     # mqtt_client.send_message("drive_inches", [0, 0])
     # mqtt_client.send_message("turn_degrees", [360 - degrees, speed])
 
@@ -110,6 +114,7 @@ class MyDelegate(object):
         self.canvas = canvas
         self.eventxold = 400
         self.eventyold = 250
+        self.bomb = 0
 
     def on_circle_draw(self, color, x, y):
         self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=color, width=3)
@@ -117,6 +122,9 @@ class MyDelegate(object):
     def newpoint(self, x, y):
         self.eventxold = x
         self.eventyold = y
+
+    def found(self):
+        self.bomb = 1
 
 
 main()
