@@ -112,8 +112,6 @@ class Snatch3r(object):
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.GREEN)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.GREEN)
         self.running = False
-        print("Goodbye!")
-        ev3.Sound.speak("Goodbye").wait()
 
     def loop_forever(self):
         """Make an infinite loop while the running"""
@@ -124,3 +122,52 @@ class Snatch3r(object):
         """Drive forever"""
         self.left_motor.run_forever(speed_sp=left_speed_entry)
         self.right_motor.run_forever(speed_sp=right_speed_entry)
+
+    def stop(self):
+        self.drive_forever(0, 0)
+
+    def seek_beacon(self):
+        """seek the beacon"""
+        beacon_seeker = ev3.BeaconSeeker(channel=1)
+
+        forward_speed = 300
+        turn_speed = 100
+
+        while not self.touch_sensor.is_pressed:
+            # The touch sensor can be used to abort the attempt (sometimes handy during testing)
+
+            current_heading = beacon_seeker.heading  # use the beacon_seeker heading
+            current_distance = beacon_seeker.distance  # use the beacon_seeker distance
+            if current_distance == -128:
+                # If the IR Remote is not found just sit idle for this program until it is moved.
+                print("IR Remote not found. Spin to find the beacon")
+                self.drive_forever(-turn_speed, turn_speed)
+            else:
+
+                if math.fabs(current_heading) < 2:
+                    # Close enough of a heading to move forward
+                    print("On the right heading. Distance: ", current_distance)
+                    # You add more!
+                    if beacon_seeker.distance == 0:
+                        print(" you have found the beacon")
+                        self.stop()
+                        return True
+                    else:
+                        self.drive_forever(forward_speed, forward_speed)
+                elif 10 > math.fabs(current_heading) >= 2:
+                    if current_heading < 0:
+                        self.drive_forever(-turn_speed, turn_speed)
+                        print("Adjusting heading: ", current_heading)
+                    elif current_heading > 0:
+                        self.drive_forever(turn_speed, -turn_speed)
+                        print("Adjusting heading: ", current_heading)
+                elif math.fabs(current_heading) > 10:
+                    self.drive_forever(-turn_speed, turn_speed)
+                    print("Spin to fix the heading: ", current_heading)
+
+            time.sleep(0.2)
+
+        # The touch_sensor was pressed to abort the attempt if this code runs.
+        print("Abandon ship!")
+        self.shutdown()
+        return False

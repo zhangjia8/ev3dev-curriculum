@@ -33,7 +33,6 @@ import time
 
 import robot_controller as robo
 
-robot = robo.Snatch3r()
 # Note that todo2 is farther down in the code.  That method needs to be written before you do todo3.
 # DONE: 3. Have someone on your team run this program on the EV3 and make sure everyone understands the code.
 # Can you see what the robot does and explain what each line of code is doing? Talk as a group to make sure.
@@ -56,7 +55,7 @@ def main():
     ev3.Sound.speak("I R Remote")
 
     ev3.Leds.all_off()  # Turn the leds off
-
+    robot = robo.Snatch3r()
     dc = DataContainer()
 
     # DONE: 4. Add the necessary IR handler callbacks as per the instructions above.
@@ -109,7 +108,7 @@ def main():
 # Observations you should make, IR buttons are a fun way to control the robot.
 
 
-def handle_red_up_1(button_state, dc):
+def handle_red_up_1(button_state, robot):
     if button_state:
         robot.left_motor.run_forever(speed_sp=600)
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.GREEN)
@@ -119,7 +118,7 @@ def handle_red_up_1(button_state, dc):
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.BLACK)
 
 
-def handle_red_down_1(button_state, dc):
+def handle_red_down_1(button_state, robot):
     if button_state:
         robot.left_motor.run_forever(speed_sp=-600)
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.RED)
@@ -129,7 +128,7 @@ def handle_red_down_1(button_state, dc):
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.BLACK)
 
 
-def handle_blue_up_1(button_state, dc):
+def handle_blue_up_1(button_state, robot):
     if button_state:
         robot.right_motor.run_forever(speed_sp=600)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.GREEN)
@@ -138,7 +137,7 @@ def handle_blue_up_1(button_state, dc):
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.BLACK)
 
 
-def handle_blue_down_1(button_state, dc):
+def handle_blue_down_1(button_state, robot):
     if button_state:
         robot.right_motor.run_forever(speed_sp=-600)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.RED)
@@ -148,17 +147,17 @@ def handle_blue_down_1(button_state, dc):
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.BLACK)
 
 
-def handle_red_up_2(button_state, dc):
+def handle_red_up_2(button_state, robot):
     if button_state:
         robot.arm_up()
 
 
-def handle_red_down_2(button_state, dc):
+def handle_red_down_2(button_state, robot):
     if button_state:
         robot.arm_down()
 
 
-def handle_blue_up_2(button_state, dc):
+def handle_blue_up_2(button_state, robot):
     if button_state:
         robot.arm_calibration()
 

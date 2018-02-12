@@ -3,8 +3,8 @@
 The goal of this module is to practice using the Pixy and MQTT at the same time.  This module will send data from the
 EV3 to the PC.
 
-Authors: David Fisher and PUT_YOUR_NAME_HERE.  February 2017.
-"""  # TODO: 1. PUT YOUR NAME IN THE ABOVE LINE.
+Authors: David Fisher and Jiatong Zhang.  February 2017.
+"""  # DONE: 1. PUT YOUR NAME IN THE ABOVE LINE.
 
 import ev3dev.ev3 as ev3
 import time
@@ -21,30 +21,38 @@ def main():
     ev3.Sound.speak("Pixy display").wait()
     print("Press the touch sensor to exit this program.")
 
-    # TODO: 2. Create an MqttClient (no delegate needed since EV3 will only send data, so an empty constructor is fine)
+    # DONE: 2. Create an MqttClient (no delegate needed since EV3 will only send data, so an empty constructor is fine)
     # Then connect to the pc using the connect_to_pc method.
+    mqtt_client = com.MqttClient()
+    mqtt_client.connect_to_pc()
 
     robot = robo.Snatch3r()
     robot.pixy.mode = "SIG1"
 
     while not robot.touch_sensor.is_pressed:
 
-        # TODO: 3. Read the Pixy values for x, y, width, and height
+        # DONE: 3. Read the Pixy values for x, y, width, and height
         # Print the values (much like the print_pixy_readings example)
+        width = robot.pixy.value(3)
+        height = robot.pixy.value(4)
+        x = robot.pixy.value(1)
+        y = robot.pixy.value(2)
 
-        # TODO: 4. Send the Pixy values to the PC by calling the on_rectangle_update method
+        print("value1: X", x)
+        print("value2: Y", y)
+        print("value3: Width", width)
+        print("value4: Height", height)
+
+        # DONE: 4. Send the Pixy values to the PC by calling the on_rectangle_update method
         # If you open m2_pc_pixy_display you can see the parameters for that method [x, y, width, height]
-
-
-
-
+        mqtt_client.send_message("on_rectangle_update", [x, y, width, height])
         time.sleep(0.25)
 
     print("Goodbye!")
     ev3.Sound.speak("Goodbye").wait()
     mqtt_client.close()
 
-# TODO: 5. Call over a TA or instructor to sign your team's checkoff sheet.
+# DONE: 5. Call over a TA or instructor to sign your team's checkoff sheet.
 #
 # Observations you should make, if the EV3 has data the PC can know that data too using MQTT.
 
@@ -53,4 +61,3 @@ def main():
 # Calls  main  to start the ball rolling.
 # ----------------------------------------------------------------------
 main()
-
