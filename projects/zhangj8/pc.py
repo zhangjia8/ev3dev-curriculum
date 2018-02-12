@@ -30,7 +30,7 @@ def main():
     canvas = tkinter.Canvas(main_frame, background="lightgray", width=320, height=200)
     canvas.grid(columnspan=2)
 
-    rect_tag = canvas.create_rectangle(155, 95, 165, 105, fill="lightgray")
+    rect_tag = canvas.create_rectangle(150, 90, 170, 110, fill="lightgray")
 
     # Buttons for quit and exit
     quit_button = ttk.Button(main_frame, text="Quit")
