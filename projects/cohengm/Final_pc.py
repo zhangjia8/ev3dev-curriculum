@@ -63,8 +63,6 @@ def clicked(mqtt_client, my_delegate, event, speed):
     print("DELTA X: ", x)
     print("DELTA Y: ", y)
 
-    turns = 0
-
     # Upper Right Quadrant
     if event.x >= my_delegate.eventxold and event.y <= my_delegate.eventyold:
         turns = 3
