@@ -32,8 +32,13 @@ def main():
     radiation_count = ttk.Label(radiation_frame, text="Radiation Spots= ")
     radiation_count.grid()
 
-    left_speed_entry = 300
-    right_speed_entry = 300
+    speed_entry = 300
+
+    inches_label = ttk.Label(control_frame, text="Inches")
+    inches_label.grid(row=0, column=2)
+    inches_entry = ttk.Entry(control_frame, width=8)
+    inches_entry.insert(0, "6")
+    inches_entry.grid(row=1, column=2)
 
     my_delegate = MyDelegate(canvas)
     mqtt_draw = com.MqttClient(my_delegate)
@@ -44,8 +49,8 @@ def main():
 
     forward_button = ttk.Button(control_frame, text="Forward")
     forward_button.grid(row=3, column=2)
-    forward_button['command'] = lambda: send_forward(mqtt_client, left_speed_entry, right_speed_entry, mqtt_draw)
-    root.bind('<Up>', lambda event: send_forward(mqtt_client, left_speed_entry, right_speed_entry, mqtt_draw))
+    forward_button['command'] = lambda: send_forward(mqtt_client, inches_entry, speed_entry, mqtt_draw)
+    root.bind('<Up>', lambda event: send_forward(mqtt_client, inches_entry, speed_entry, mqtt_draw))
 
     left_button = ttk.Button(control_frame, text="Left")
     left_button.grid(row=4, column=1)
@@ -68,8 +73,8 @@ def main():
     back_button = ttk.Button(control_frame, text="Back")
     back_button.grid(row=5, column=2)
     # back_button and '<Down>' key
-    back_button['command'] = lambda: send_back(mqtt_client, left_speed_entry, right_speed_entry)
-    root.bind('<Down>', lambda event: send_back(mqtt_client, left_speed_entry, right_speed_entry))
+    back_button['command'] = lambda: send_back(mqtt_client, inches_entry, speed_entry)
+    root.bind('<Down>', lambda event: send_back(mqtt_client, inches_entry, speed_entry))
 
     # Buttons for quit and exit
     q_button = ttk.Button(control_frame, text="Quit")
@@ -88,9 +93,9 @@ def clear(canvas):
     canvas.delete("all")
 
 
-def send_forward(mqtt_client, left_speed_entry, right_speed_entry, delegate):
+def send_forward(mqtt_client, inches, speed, delegate):
     print("Forward")
-    mqtt_client.send_message("drive_forever", [int(left_speed_entry), int(right_speed_entry)])
+    mqtt_client.send_message("drive_inches", [int(inches.get()), int(speed)])
     delegate.send_message("on_circle_draw", ["green", 400, 200])
 
 
@@ -104,9 +109,9 @@ def send_right(mqtt_client):
     mqtt_client.send_message("turn_degrees", [-90, 300])
 
 
-def send_back(mqtt_client, left_speed_entry, right_speed_entry):
+def send_back(mqtt_client, inches, speed):
     print("Back")
-    mqtt_client.send_message("drive_forever", [-int(left_speed_entry), -int(right_speed_entry)])
+    mqtt_client.send_message("drive_inches", [-int(inches.get()), -int(speed)])
 
 
 def send_stop(mqtt_client):
