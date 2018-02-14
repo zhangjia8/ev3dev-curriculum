@@ -74,7 +74,6 @@ def main():
         height = robot.pixy.value(4)
         print("X={},Y={},Width={},Height={}".format(x, y, width, height))
         mqtt_client.send_message("on_rectangle_update", [x, y, width, height])
-        time.sleep(0.01)
 
     mqtt_client.close()
     print("Mission Complete.")
