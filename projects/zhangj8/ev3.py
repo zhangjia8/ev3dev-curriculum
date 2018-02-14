@@ -38,19 +38,6 @@ def main():
 
     robot.arm_calibration()  # Start with an arm calibration in this program.
 
-    rc1 = ev3.RemoteControl(channel=1)
-
-    rc1.on_red_up = lambda state: handle_red_up_1(state, robot)
-    rc1.on_red_down = lambda state: handle_red_down_1(state, robot)
-    rc1.on_blue_up = lambda state: handle_blue_up_1(state, robot)
-    rc1.on_blue_down = lambda state: handle_blue_down_1(state, robot)
-
-    rc2 = ev3.RemoteControl(channel=2)
-
-    rc2.on_red_up = lambda state: handle_red_up_2(state, robot)
-    rc2.on_red_down = lambda state: handle_red_down_2(state, robot)
-    rc2.on_blue_up = lambda state: handle_blue_up_2(state, robot)
-
     # Find the beacon first
     while True:
         found_beacon = robot.seek_beacon()
@@ -64,7 +51,19 @@ def main():
         if command == "q":
             break
 
-    # Use the beacon to drive ev3 and use the pixy camera to see what ev3 see
+    # Now change to use the remote control as a RemoteControl not a BeaconSeeker
+    rc1 = ev3.RemoteControl(channel=1)
+    rc1.on_red_up = lambda state: handle_red_up_1(state, robot)
+    rc1.on_red_down = lambda state: handle_red_down_1(state, robot)
+    rc1.on_blue_up = lambda state: handle_blue_up_1(state, robot)
+    rc1.on_blue_down = lambda state: handle_blue_down_1(state, robot)
+
+    rc2 = ev3.RemoteControl(channel=2)
+    rc2.on_red_up = lambda state: handle_red_up_2(state, robot)
+    rc2.on_red_down = lambda state: handle_red_down_2(state, robot)
+    rc2.on_blue_up = lambda state: handle_blue_up_2(state, robot)
+
+    # Use the RemoteControl to drive ev3 and use the pixy camera to see what ev3 see
     while dc.running:
         rc1.process()
         rc2.process()
@@ -76,6 +75,7 @@ def main():
         print("X={},Y={},Width={},Height={}".format(x, y, width, height))
         mqtt_client.send_message("on_rectangle_update", [x, y, width, height])
         time.sleep(0.01)
+
     mqtt_client.close()
     print("Mission Complete.")
     ev3.Sound.speak("Mission Complete!").wait()
