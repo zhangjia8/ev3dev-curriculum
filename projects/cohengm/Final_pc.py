@@ -23,16 +23,16 @@ def main():
 
     canvas.create_oval(390, 240, 410, 260, fill="red", width=3)
 
+    my_delegate = MyDelegate(canvas)
+    mqtt_client = com.MqttClient(my_delegate)
+    mqtt_client.connect("draw", "draw")
+
     # Make callbacks for mouse click events.
-    canvas.bind("<Button-1>", lambda event: clicked(event, canvas, 500))
+    canvas.bind("<Button-1>", lambda event: clicked(mqtt_client, my_delegate, event, 300))
 
     quit_button = ttk.Button(main_frame, text="Quit")
     quit_button.grid(row=1, column=3)
     quit_button["command"] = lambda: quit_program(mqtt_client)
-
-    my_delegate = MyDelegate(canvas)
-    mqtt_client = com.MqttClient(my_delegate)
-    mqtt_client.connect("draw", "draw")
 
     bomb_squad = ttk.Label(main_frame, text="Find Some Bombs!")
     bomb_squad.grid(row=0, column=2)
@@ -40,11 +40,7 @@ def main():
     root.mainloop()
 
 
-def clicked(event, canvas, speed):
-
-    my_delegate = MyDelegate(canvas)
-    mqtt_client = com.MqttClient(my_delegate)
-    mqtt_client.connect("draw", "draw")
+def clicked(mqtt_client, my_delegate, event, speed):
 
     print("You clicked location ({},{})".format(event.x, event.y))
     my_color = "green"  # Color of circle
@@ -55,31 +51,48 @@ def clicked(event, canvas, speed):
 
     x = math.fabs(event.x - my_delegate.eventxold)
     y = math.fabs(event.y - my_delegate.eventyold)
-    # distance = math.sqrt(x**2 + y**2)/10
-    angle = math.tan(y/x)*180/math.pi
-    degrees = 10
+    distance = math.sqrt(x**2 + y**2)/10
+    degrees = 0
+
+    print("")
+    print("X: ", event.x)
+    print("Y: ", event.y)
+    print("X OLD: ", my_delegate.eventxold)
+    print("Y OLD: ", my_delegate.eventyold)
+    print("DELTA X: ", x)
+    print("DELTA Y: ", y)
 
     # Upper Right Quadrant
-    if event.x >= 400 and event.y <= 250:
-        degrees = angle
+    if event.x >= my_delegate.eventxold and event.y <= my_delegate.eventyold:
+        angle = math.fabs((math.tan(y / x) * 180 / math.pi))
+        turns = 3
+        degrees = angle + 90*turns
+    # Lower Right Quadrant
+    if event.x >= my_delegate.eventxold and event.y >= my_delegate.eventyold:
+        angle = math.fabs((math.tan(x / y) * 180 / math.pi))
+        turns = 2
+        degrees = angle + 90*turns
+    # Lower Left Quadrant
+    if event.x <= my_delegate.eventxold and event.y >= my_delegate.eventyold:
+        angle = math.fabs((math.tan(y / x) * 180 / math.pi))
+        turns = 1
+        degrees = angle + 90 * turns
+    # Upper Left Quadrant
+    if event.x <= my_delegate.eventxold and event.y <= my_delegate.eventyold:
+        angle = math.fabs((math.tan(x / y) * 180 / math.pi))
+        turns = 0
+        degrees = angle + 90 * turns
+    # while ev3.ColorSensor.color != "White":
+    my_delegate.newpoint(event.x, event.y)
+    # while my_delegate.bomb == 0:
+    print("Turns: ", turns)
     print("Deg: ", degrees)
-    print("X: ", x)
-    print("Y: ", y)
-    # # Upper Left Quadrant
-    # if event.x <= 400 & event.y <= 250:
-    #     degrees = -(90-angle)
-    # # Lower Right Quadrant
-    # if event.x >= 400 & event.y >= 250:
-    #     degrees = 90 + angle
-    # # Lower Left Quadrant
-    # if event.x <= 400 & event.y >= 250:
-    #     degrees = -(90 + angle)
-    # print("turn_degrees")
     mqtt_client.send_message("turn_degrees", [degrees, speed])
-    # print("drive_inches")
-    # mqtt_client.send_message("drive_inches", [distance, speed])
-    my_delegate.eventxold = event.x
-    my_delegate.eventyold = event.y
+    print("Dis: ", distance)
+    mqtt_client.send_message("drive_inches", [distance, speed])
+    mqtt_client.send_message("turn_degrees", [360 - degrees, speed])
+    # mqtt_client.send_message("drive_inches", [0, 0])
+    # mqtt_client.send_message("turn_degrees", [360 - degrees, speed])
 
 
 def clear(canvas):
@@ -101,9 +114,17 @@ class MyDelegate(object):
         self.canvas = canvas
         self.eventxold = 400
         self.eventyold = 250
+        self.bomb = 0
 
     def on_circle_draw(self, color, x, y):
         self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=color, width=3)
+
+    def newpoint(self, x, y):
+        self.eventxold = x
+        self.eventyold = y
+
+    def found(self):
+        self.bomb = 1
 
 
 main()
