@@ -41,8 +41,23 @@ def main():
 
     speed_entry = 300
 
-    slider = ttk.Scale(control_frame, from_=200, to=900)
-    slider.pack()
+    def bluer():
+        mqtt_draw.send_message("changeblue")
+
+    def greener():
+        mqtt_draw.send_message("changegreen")
+
+    def yellower():
+        mqtt_draw.send_message("changeyellow")
+
+    radiation_color = ttk.Checkbutton
+    blue = ttk.Checkbutton(control_frame, text='Blue Sensor', command=bluer,
+                           variable=radiation_color)
+    green = ttk.Checkbutton(control_frame, text='Green Sensor', command=greener, variable=radiation_color)
+    yellow = ttk.Checkbutton(control_frame, text='Yellow Sensor', command=yellower, variable=radiation_color)
+    yellow.grid()
+    green.grid()
+    blue.grid()
 
     forward_button = ttk.Button(control_frame, text="Forward")
     forward_button.grid(row=3, column=2)
@@ -93,7 +108,7 @@ def clear(canvas):
 def send_forward(mqtt_client, inches, speed, delegate):
     print("Forward")
     mqtt_client.send_message("drive_inches", [int(inches.get()), int(speed)])
-    delegate.send_message("on_circle_draw", ["green", int(inches.get())])
+    delegate.send_message("on_circle_draw", [int(inches.get())])
 
 
 def send_left(mqtt_client, delegate):
@@ -111,7 +126,7 @@ def send_right(mqtt_client, delegate):
 def send_back(mqtt_client, inches, speed, delegate):
     print("Back")
     mqtt_client.send_message("drive_inches", [-int(inches.get()), -int(speed)])
-    delegate.send_message("on_circle_draw", ["green", -int(inches.get())])
+    delegate.send_message("on_circle_draw", [-int(inches.get())])
 
 
 def send_stop(mqtt_client):
@@ -136,8 +151,9 @@ class MyDelegate(object):
         self.xold = 400
         self.yold = 250
         self.turns = 0
+        self.color = "green"
 
-    def on_circle_draw(self, color, inches):
+    def on_circle_draw(self, inches):
 
         if self.turns == -3:
             self.turns = 1
@@ -160,7 +176,7 @@ class MyDelegate(object):
             x = self.xold
             y = self.yold + inches*10
 
-        self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=color, width=3)
+        self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=self.color, width=3)
 
         self.xold = x
         self.yold = y
@@ -173,6 +189,15 @@ class MyDelegate(object):
 
     def found(self):
         self.radiation_count = 1 + self.radiation_count
+
+    def changeblue(self):
+        self.color = "blue"
+
+    def changegreen(self):
+        self.color = "green"
+
+    def changeyellow(self):
+        self.color = "yellow"
 
 
 main()
