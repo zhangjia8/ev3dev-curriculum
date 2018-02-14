@@ -55,8 +55,8 @@ def main():
     left_button = ttk.Button(control_frame, text="Left")
     left_button.grid(row=4, column=1)
     # left_button and '<Left>' key
-    left_button['command'] = lambda: send_left(mqtt_client)
-    root.bind('<Left>', lambda event: send_left(mqtt_client))
+    left_button['command'] = lambda: send_left(mqtt_client, mqtt_draw)
+    root.bind('<Left>', lambda event: send_left(mqtt_client, mqtt_draw))
 
     stop_button = ttk.Button(control_frame, text="Stop")
     stop_button.grid(row=4, column=2)
@@ -67,14 +67,14 @@ def main():
     right_button = ttk.Button(control_frame, text="Right")
     right_button.grid(row=4, column=3)
     # right_button and '<Right>' key
-    right_button['command'] = lambda: send_right(mqtt_client)
-    root.bind('<Right>', lambda event: send_right(mqtt_client))
+    right_button['command'] = lambda: send_right(mqtt_client, mqtt_draw)
+    root.bind('<Right>', lambda event: send_right(mqtt_client, mqtt_draw))
 
     back_button = ttk.Button(control_frame, text="Back")
     back_button.grid(row=5, column=2)
     # back_button and '<Down>' key
-    back_button['command'] = lambda: send_back(mqtt_client, inches_entry, speed_entry)
-    root.bind('<Down>', lambda event: send_back(mqtt_client, inches_entry, speed_entry))
+    back_button['command'] = lambda: send_back(mqtt_client, inches_entry, speed_entry, mqtt_draw)
+    root.bind('<Down>', lambda event: send_back(mqtt_client, inches_entry, speed_entry, mqtt_draw))
 
     # Buttons for quit and exit
     q_button = ttk.Button(control_frame, text="Quit")
@@ -96,22 +96,25 @@ def clear(canvas):
 def send_forward(mqtt_client, inches, speed, delegate):
     print("Forward")
     mqtt_client.send_message("drive_inches", [int(inches.get()), int(speed)])
-    delegate.send_message("on_circle_draw", ["green", 400, 200])
+    delegate.send_message("on_circle_draw", ["green", int(inches.get())])
 
 
-def send_left(mqtt_client):
+def send_left(mqtt_client, delegate):
     print("Left")
     mqtt_client.send_message("turn_degrees", [90, 300])
+    delegate.send_message("turn_left")
 
 
-def send_right(mqtt_client):
+def send_right(mqtt_client, delegate):
     print("Right")
-    mqtt_client.send_message("turn_degrees", [-90, 300])
+    mqtt_client.send_message("turn_degrees", [270, 300])
+    delegate.send_message("turn_right")
 
 
-def send_back(mqtt_client, inches, speed):
+def send_back(mqtt_client, inches, speed, delegate):
     print("Back")
     mqtt_client.send_message("drive_inches", [-int(inches.get()), -int(speed)])
+    delegate.send_message("on_circle_draw", ["green", -int(inches.get())])
 
 
 def send_stop(mqtt_client):
@@ -132,15 +135,47 @@ class MyDelegate(object):
 
     def __init__(self, canvas):
         self.canvas = canvas
-        self.radiaiton_count = 0
-        self.x = 400
-        self.y = 250
+        self.radiation_count = 0
+        self.xold = 400
+        self.yold = 250
+        self.turns = 0
 
-    def on_circle_draw(self, color, x, y):
+    def on_circle_draw(self, color, inches):
+
+        if self.turns == -3:
+            self.turns = 1
+        if self.turns == 3:
+            self.turns = -1
+
+        x=0
+        y=0
+
+        if self.turns % 3 == 0:
+            x = self.xold
+            y = self.yold - inches*10
+        if self.turns % 3 == 1:
+            x = self.xold + inches*10
+            y = self.yold
+        if self.turns % 3 == 2:
+            x = self.xold - inches*10
+            y = self.yold
+        if self.turns == 2 or self.turns == -2:
+            x = self.xold
+            y = self.yold + inches*10
+
         self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=color, width=3)
 
+        self.xold = x
+        self.yold = y
+
+    def turn_right(self):
+        self.turns = self.turns + 1
+
+    def turn_left(self):
+        self.turns = self.turns - 1
+
     def found(self):
-        self.radiaiton_count = 1
+        self.radiation_count = 1
 
 
 main()
