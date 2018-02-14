@@ -15,8 +15,11 @@ class DataContainer(object):
 def main():
     print("--------------------------------------------")
     print("Finding something")
+    print(" - Find the beacon first")
     print(" - Use IR remote channel 1 to drive around")
-    print(" - Use IR remote channel 2 to for the arm")
+    print(" - Use IR remote channel 2 for the arm")
+    print(" - Find the target by")
+    print(" - looking at what EV3 see.")
     print(" - Press the Back button on EV3 to exit")
     print("--------------------------------------------")
     ev3.Sound.beep()
@@ -28,6 +31,7 @@ def main():
     mqtt_client = com.MqttClient()
     mqtt_client.connect_to_pc()
     robot.pixy.mode = "SIG2"
+
     # For our standard shutdown button.
     btn = ev3.Button()
     btn.on_backspace = lambda state: handle_shutdown(state, dc)
@@ -47,6 +51,7 @@ def main():
     rc2.on_red_down = lambda state: handle_red_down_2(state, robot)
     rc2.on_blue_up = lambda state: handle_blue_up_2(state, robot)
 
+    # Find the beacon first
     while True:
         found_beacon = robot.seek_beacon()
         if found_beacon:
@@ -59,6 +64,7 @@ def main():
         if command == "q":
             break
 
+    # Use the beacon to drive ev3 and use the pixy camera to see what ev3 see
     while dc.running:
         rc1.process()
         rc2.process()
