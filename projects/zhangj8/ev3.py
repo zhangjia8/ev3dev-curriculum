@@ -19,7 +19,7 @@ def main():
     print(" - Use IR remote channel 2 to for the arm")
     print(" - Press the Back button on EV3 to exit")
     print("--------------------------------------------")
-    ev3.Sound.speak("Find in something")
+    ev3.Sound.beep()
 
     ev3.Leds.all_off()  # Turn the leds off
     robot = robo.Snatch3r()
@@ -47,30 +47,37 @@ def main():
     rc2.on_red_down = lambda state: handle_red_down_2(state, robot)
     rc2.on_blue_up = lambda state: handle_blue_up_2(state, robot)
 
+    while True:
+        found_beacon = robot.seek_beacon()
+        if found_beacon:
+            ev3.Sound.speak("I got the beacon")
+            print("Now you can drive!")
+            robot.arm_up()
+            time.sleep(1)
+            robot.arm_down()
+        command = input("Hit enter to seek the beacon again or enter q to drive: ")
+        if command == "q":
+            break
+
     while dc.running:
         rc1.process()
         rc2.process()
         btn.process()
-
         x = robot.pixy.value(1)
         y = robot.pixy.value(2)
         width = robot.pixy.value(3)
         height = robot.pixy.value(4)
+        print("X={},Y={},Width={},Height={}".format(x, y, width, height))
         mqtt_client.send_message("on_rectangle_update", [x, y, width, height])
-
-        if robot.ir_sensor.proximity <= 10:
-            ev3.Sound.speak("Found something!")
-            time.sleep(0.01)
-        time.sleep(0.25)
-
+        time.sleep(0.01)
+    mqtt_client.close()
     print("Mission Complete.")
     ev3.Sound.speak("Mission Complete!").wait()
-    mqtt_client.close()
 
 
 def handle_red_up_1(button_state, robot):
     if button_state:
-        robot.left_motor.run_forever(speed_sp=200)
+        robot.left_motor.run_forever(speed_sp=300)
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.GREEN)
 
     else:
@@ -80,7 +87,7 @@ def handle_red_up_1(button_state, robot):
 
 def handle_red_down_1(button_state, robot):
     if button_state:
-        robot.left_motor.run_forever(speed_sp=-200)
+        robot.left_motor.run_forever(speed_sp=-300)
         ev3.Leds.set_color(ev3.Leds.LEFT, ev3.Leds.RED)
 
     else:
@@ -90,7 +97,7 @@ def handle_red_down_1(button_state, robot):
 
 def handle_blue_up_1(button_state, robot):
     if button_state:
-        robot.right_motor.run_forever(speed_sp=200)
+        robot.right_motor.run_forever(speed_sp=300)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.GREEN)
     else:
         robot.right_motor.stop()
@@ -99,7 +106,7 @@ def handle_blue_up_1(button_state, robot):
 
 def handle_blue_down_1(button_state, robot):
     if button_state:
-        robot.right_motor.run_forever(speed_sp=-200)
+        robot.right_motor.run_forever(speed_sp=-300)
         ev3.Leds.set_color(ev3.Leds.RIGHT, ev3.Leds.RED)
 
     else:
