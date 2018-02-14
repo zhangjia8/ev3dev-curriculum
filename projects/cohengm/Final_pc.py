@@ -31,7 +31,12 @@ def main():
     mqtt_draw.connect("draw", "draw")
 
     count = tkinter.IntVar()
-    count.set(my_delegate.radiation_count)
+
+    def countup():
+        count.set(my_delegate.radiation_count)
+
+    tkinter.Button(radiation_frame, text="CHECK", command=countup, fg="red", bg="white").grid()
+
     radiation_label = ttk.Label(radiation_frame, text="Radiation Count")
     radiation_count = ttk.Label(radiation_frame, textvariable=count)
     radiation_label.grid()
@@ -56,6 +61,9 @@ def main():
 
     def yellower():
         mqtt_draw.send_message("changeyellow")
+
+    def found():
+        print("YEET")
 
     radiation_color = ttk.Checkbutton
     blue = ttk.Checkbutton(control_frame, text='Blue Sensor', command=bluer,
@@ -195,7 +203,7 @@ class MyDelegate(object):
         self.turns = self.turns - 1
 
     def found(self):
-        self.radiation_count = 1 + self.radiation_count
+        self.radiation_count = self.radiation_count + 1
 
     def changeblue(self):
         self.color = "blue"

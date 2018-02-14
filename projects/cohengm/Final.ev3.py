@@ -13,6 +13,10 @@ def main():
         if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
             ev3.Sound.speak("Found Radiation").wait()
             mqtt_client.send_message("found")
+
+        if robot.color_sensor.color == ev3.ColorSensor.COLOR_RED:
+            ev3.Sound.speak("DETH").wait()
+            robot.turn_degrees(360,400)
         time.sleep(2)
 
 
