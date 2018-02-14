@@ -30,6 +30,13 @@ def main():
     mqtt_draw = com.MqttClient(my_delegate)
     mqtt_draw.connect("draw", "draw")
 
+    count = tkinter.IntVar()
+    count.set(my_delegate.radiation_count)
+    radiation_label = ttk.Label(radiation_frame, text="Radiation Count")
+    radiation_count = ttk.Label(radiation_frame, textvariable=count)
+    radiation_label.grid()
+    radiation_count.grid()
+
     mqtt_client = com.MqttClient()
     mqtt_client.connect_to_ev3()
 
