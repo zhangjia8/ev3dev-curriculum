@@ -15,8 +15,11 @@ class DataContainer(object):
 def main():
     print("--------------------------------------------")
     print("Finding something")
+    print(" - Find the beacon first")
     print(" - Use IR remote channel 1 to drive around")
-    print(" - Use IR remote channel 2 to for the arm")
+    print(" - Use IR remote channel 2 for the arm")
+    print(" - Find the target by")
+    print(" - looking at what EV3 see.")
     print(" - Press the Back button on EV3 to exit")
     print("--------------------------------------------")
     ev3.Sound.beep()
@@ -28,25 +31,14 @@ def main():
     mqtt_client = com.MqttClient()
     mqtt_client.connect_to_pc()
     robot.pixy.mode = "SIG2"
+
     # For our standard shutdown button.
     btn = ev3.Button()
     btn.on_backspace = lambda state: handle_shutdown(state, dc)
 
     robot.arm_calibration()  # Start with an arm calibration in this program.
 
-    rc1 = ev3.RemoteControl(channel=1)
-
-    rc1.on_red_up = lambda state: handle_red_up_1(state, robot)
-    rc1.on_red_down = lambda state: handle_red_down_1(state, robot)
-    rc1.on_blue_up = lambda state: handle_blue_up_1(state, robot)
-    rc1.on_blue_down = lambda state: handle_blue_down_1(state, robot)
-
-    rc2 = ev3.RemoteControl(channel=2)
-
-    rc2.on_red_up = lambda state: handle_red_up_2(state, robot)
-    rc2.on_red_down = lambda state: handle_red_down_2(state, robot)
-    rc2.on_blue_up = lambda state: handle_blue_up_2(state, robot)
-
+    # Find the beacon first
     while True:
         found_beacon = robot.seek_beacon()
         if found_beacon:
@@ -59,17 +51,35 @@ def main():
         if command == "q":
             break
 
+    # Now change to use the remote control as a RemoteControl not a BeaconSeeker
+    rc1 = ev3.RemoteControl(channel=1)
+    rc1.on_red_up = lambda state: handle_red_up_1(state, robot)
+    rc1.on_red_down = lambda state: handle_red_down_1(state, robot)
+    rc1.on_blue_up = lambda state: handle_blue_up_1(state, robot)
+    rc1.on_blue_down = lambda state: handle_blue_down_1(state, robot)
+
+    rc2 = ev3.RemoteControl(channel=2)
+    rc2.on_red_up = lambda state: handle_red_up_2(state, robot)
+    rc2.on_red_down = lambda state: handle_red_down_2(state, robot)
+    rc2.on_blue_up = lambda state: handle_blue_up_2(state, robot)
+
+    # Use the RemoteControl to drive ev3 and use the pixy camera to see what ev3 see
     while dc.running:
         rc1.process()
         rc2.process()
         btn.process()
+
         x = robot.pixy.value(1)
         y = robot.pixy.value(2)
         width = robot.pixy.value(3)
         height = robot.pixy.value(4)
         print("X={},Y={},Width={},Height={}".format(x, y, width, height))
         mqtt_client.send_message("on_rectangle_update", [x, y, width, height])
-        time.sleep(0.01)
+
+        if robot.ir_sensor.proximity < 5:
+            robot.stop()
+            ev3.Sound.speak("We are under attack!").wait()
+
     mqtt_client.close()
     print("Mission Complete.")
     ev3.Sound.speak("Mission Complete!").wait()
