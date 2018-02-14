@@ -11,9 +11,9 @@ def main():
 
     ev3.Sound.beep()
 
-    while robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
-        robot.drive_forever(0, 0)
-        ev3.Sound.speak("Found Bomb").wait()
+    # while robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
+    #     robot.drive_forever(0, 0)
+    #     ev3.Sound.speak("Found Bomb").wait()
 
     robot.loop_forever()
 

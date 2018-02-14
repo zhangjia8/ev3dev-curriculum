@@ -49,10 +49,47 @@ def clicked(mqtt_client, my_delegate, event, speed):
     mqtt_client = com.MqttClient()
     mqtt_client.connect_to_ev3()
 
-    x = math.fabs(event.x - my_delegate.eventxold)
-    y = math.fabs(event.y - my_delegate.eventyold)
-    distance = math.sqrt(x**2 + y**2)/10
     degrees = 0
+    distance = 0
+    turns = 0
+    x = 0
+    y = 0
+
+    # Upper Right Quadrant
+    if event.x >= my_delegate.eventxold and event.y <= my_delegate.eventyold:
+        x = event.x - my_delegate.eventxold
+        y = my_delegate.eventyold - event.y
+        distance = math.sqrt(x ** 2 + y ** 2) / 10
+        angle = math.tan(y / x) * 180 / math.pi
+        turns = 3
+        degrees = angle + 90 * turns
+    # Lower Right Quadrant
+    if event.x >= my_delegate.eventxold and event.y >= my_delegate.eventyold:
+        x = event.x - my_delegate.eventxold
+        y = event.y - my_delegate.eventyold
+        distance = math.sqrt(x ** 2 + y ** 2) / 10
+        angle = math.tan(x / y) * 180 / math.pi
+        turns = 2
+        degrees = angle + 90 * turns
+    # Lower Left Quadrant
+    if event.x <= my_delegate.eventxold and event.y >= my_delegate.eventyold:
+        x = my_delegate.eventxold - event.x
+        y = event.y - my_delegate.eventyold
+        distance = math.sqrt(x ** 2 + y ** 2) / 10
+        angle = math.tan(y / x) * 180 / math.pi
+        turns = 1
+        degrees = angle + 90 * turns
+    # Upper Left Quadrant
+    if event.x <= my_delegate.eventxold and event.y <= my_delegate.eventyold:
+        x = my_delegate.eventxold - event.x
+        y = my_delegate.eventyold - event.y
+        distance = math.sqrt(x ** 2 + y ** 2) / 10
+        angle = math.tan(y / x) * 180 / math.pi
+        turns = 0
+        degrees = angle + 90 * turns
+    # while ev3.ColorSensor.color != "White":
+    my_delegate.newpoint(event.x, event.y)
+    # while my_delegate.bomb == 0:
 
     print("")
     print("X: ", event.x)
@@ -61,31 +98,8 @@ def clicked(mqtt_client, my_delegate, event, speed):
     print("Y OLD: ", my_delegate.eventyold)
     print("DELTA X: ", x)
     print("DELTA Y: ", y)
-
-    # Upper Right Quadrant
-    if event.x >= my_delegate.eventxold and event.y <= my_delegate.eventyold:
-        angle = math.fabs((math.tan(y / x) * 180 / math.pi))
-        turns = 3
-        degrees = angle + 90*turns
-    # Lower Right Quadrant
-    if event.x >= my_delegate.eventxold and event.y >= my_delegate.eventyold:
-        angle = math.fabs((math.tan(x / y) * 180 / math.pi))
-        turns = 2
-        degrees = angle + 90*turns
-    # Lower Left Quadrant
-    if event.x <= my_delegate.eventxold and event.y >= my_delegate.eventyold:
-        angle = math.fabs((math.tan(y / x) * 180 / math.pi))
-        turns = 1
-        degrees = angle + 90 * turns
-    # Upper Left Quadrant
-    if event.x <= my_delegate.eventxold and event.y <= my_delegate.eventyold:
-        angle = math.fabs((math.tan(x / y) * 180 / math.pi))
-        turns = 0
-        degrees = angle + 90 * turns
-    # while ev3.ColorSensor.color != "White":
-    my_delegate.newpoint(event.x, event.y)
-    # while my_delegate.bomb == 0:
     print("Turns: ", turns)
+
     print("Deg: ", degrees)
     mqtt_client.send_message("turn_degrees", [degrees, speed])
     print("Dis: ", distance)
