@@ -9,13 +9,11 @@ def main():
     mqtt_client = com.MqttClient(robot)
     mqtt_client.connect_to_pc()
 
-    ev3.Sound.beep()
-
-    if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
-        robot.drive_forever(0, 0)
-        ev3.Sound.speak("Found Radiation").wait()
-
-    robot.loop_forever()
+    while True:
+        if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
+            ev3.Sound.speak("Found Radiation").wait()
+            mqtt_client.send_message("found")
+        time.sleep(2)
 
 
 main()

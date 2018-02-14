@@ -26,26 +26,23 @@ def main():
 
     canvas.create_oval(390, 240, 410, 260, fill="green", width=3)
 
-    radiation_title = ttk.Label(main_frame, text="Find Radiation Poison!")
-    radiation_title.grid(row=0, column=4)
-
-    radiation_count = ttk.Label(radiation_frame, text="Radiation Spots= ")
-    radiation_count.grid()
-
-    speed_entry = 300
-
-    inches_label = ttk.Label(control_frame, text="Inches")
-    inches_label.grid(row=0, column=2)
-    inches_entry = ttk.Entry(control_frame, width=8)
-    inches_entry.insert(0, "6")
-    inches_entry.grid(row=1, column=2)
-
     my_delegate = MyDelegate(canvas)
     mqtt_draw = com.MqttClient(my_delegate)
     mqtt_draw.connect("draw", "draw")
 
     mqtt_client = com.MqttClient()
     mqtt_client.connect_to_ev3()
+
+    inches_label = ttk.Label(control_frame, text="Inches")
+    inches_label.grid(row=0, column=2)
+    inches_entry = ttk.Entry(control_frame, width=8)
+    inches_entry.insert(0, "6    ")
+    inches_entry.grid(row=1, column=2)
+
+    speed_entry = 300
+
+    slider = ttk.Scale(control_frame, from_=200, to=900)
+    slider.pack()
 
     forward_button = ttk.Button(control_frame, text="Forward")
     forward_button.grid(row=3, column=2)
@@ -147,8 +144,8 @@ class MyDelegate(object):
         if self.turns == 3:
             self.turns = -1
 
-        x=0
-        y=0
+        x = 0
+        y = 0
 
         if self.turns % 3 == 0:
             x = self.xold
@@ -175,7 +172,7 @@ class MyDelegate(object):
         self.turns = self.turns - 1
 
     def found(self):
-        self.radiation_count = 1
+        self.radiation_count = 1 + self.radiation_count
 
 
 main()
