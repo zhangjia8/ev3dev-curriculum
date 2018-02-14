@@ -68,12 +68,17 @@ def main():
         rc1.process()
         rc2.process()
         btn.process()
+
         x = robot.pixy.value(1)
         y = robot.pixy.value(2)
         width = robot.pixy.value(3)
         height = robot.pixy.value(4)
         print("X={},Y={},Width={},Height={}".format(x, y, width, height))
         mqtt_client.send_message("on_rectangle_update", [x, y, width, height])
+
+        if robot.ir_sensor.proximity < 5:
+            robot.stop()
+            ev3.Sound.speak("We are under attack!").wait()
 
     mqtt_client.close()
     print("Mission Complete.")
