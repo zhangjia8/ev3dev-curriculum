@@ -9,10 +9,6 @@ class MyDelegate(object):
     def __init__(self):
         self.running = True
 
-    def check_rad(self):
-        print("Received")
-
-
 
 def main():
     robot = robo.Snatch3r()
@@ -24,18 +20,16 @@ def main():
     mqtt_client.connect_to_pc()
 
     while True:
-        if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
-            ev3.Sound.speak("Found Radiation").wait()
-            found(mqtt_client, 5)
+        if robot.color_sensor.color != ev3.ColorSensor.COLOR_RED or robot.color_sensor.color != ev3.ColorSensor.COLOR_WHITE:
+            time.sleep(2)
+            if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
+                ev3.Sound.speak("Found Radiation").wait()
+                mqtt_client.send_message("check", [5])
 
-        if robot.color_sensor.color == ev3.ColorSensor.COLOR_RED:
-            ev3.Sound.speak("DETH").wait()
-            robot.turn_degrees(360, 400)
-        time.sleep(2)
-
-
-def found(mqtt_client, number):
-    mqtt_client.send_message("rad_found", [number])
+            if robot.color_sensor.color == ev3.ColorSensor.COLOR_RED:
+                ev3.Sound.speak("DETH").wait()
+                robot.turn_degrees(360, 400)
+            time.sleep(2)
 
 
 main()

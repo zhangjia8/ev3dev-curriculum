@@ -9,12 +9,13 @@ import mqtt_remote_method_calls as com
 
 class MyDelegate(object):
 
-    def __init__(self, canvas):
+    def __init__(self, canvas, label):
         self.canvas = canvas
         self.xold = 400
         self.yold = 250
         self.turns = 0
         self.color = "green"
+        self.display_label = label
 
     def on_circle_draw(self, inches):
 
@@ -59,6 +60,11 @@ class MyDelegate(object):
     def changeyellow(self):
         self.color = "yellow"
 
+    def check(self, number):
+        print("Received: " + str(number))
+        message_to_display = "{}".format(number)
+        self.display_label.configure(text=message_to_display)
+
 
 def main():
     root = tkinter.Tk()
@@ -79,18 +85,18 @@ def main():
 
     canvas.create_oval(390, 240, 410, 260, fill="green", width=3)
 
-    my_delegate = MyDelegate(canvas)
+    button_message = ttk.Label(radiation_frame, text="--")
+    button_message.grid(row=2, column=0)
+
+    my_delegate = MyDelegate(canvas, button_message)
     mqtt_draw = com.MqttClient(my_delegate)
     mqtt_draw.connect("draw", "draw")
 
-    count_button = tkinter.Button(radiation_frame, text="CHECK", fg="red", bg="white")
-    count_button.grid()
-    count_button['command'] = lambda: send_check(mqtt_client)
-
     radiation_label = ttk.Label(radiation_frame, text="Radiation Count")
-    radiation_label.grid()
+    radiation_label.grid(row=1)
 
-    mqtt_client = com.MqttClient()
+    pc_delegate = MyDelegate(canvas, button_message)
+    mqtt_client = com.MqttClient(pc_delegate)
     mqtt_client.connect_to_ev3()
 
     inches_label = ttk.Label(control_frame, text="Inches")
@@ -192,11 +198,6 @@ def send_back(mqtt_client, inches, speed, delegate):
 def send_stop(mqtt_client):
     print("Stop")
     mqtt_client.send_message("drive_forever", [0, 0])
-
-
-def send_check(mqtt_client):
-    print("Sending Check")
-    mqtt_client.send_message("check_rad")
 
 
 # Quit and Exit button callbacks
