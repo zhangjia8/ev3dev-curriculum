@@ -8,6 +8,12 @@ class MyDelegate(object):
 
     def __init__(self):
         self.running = True
+        self.rad = False
+
+    def check_rad(self):
+        self.rad = True
+        time.sleep(0.1)
+        self.rad = False
 
 
 def main():
@@ -20,7 +26,7 @@ def main():
     mqtt_client.connect_to_pc()
 
     while True:
-        if robot.color_sensor.color != ev3.ColorSensor.COLOR_RED or robot.color_sensor.color != ev3.ColorSensor.COLOR_WHITE:
+        if my_delegate.rad:
             time.sleep(2)
             if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
                 ev3.Sound.speak("Found Radiation").wait()

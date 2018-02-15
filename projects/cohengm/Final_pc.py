@@ -16,6 +16,7 @@ class MyDelegate(object):
         self.turns = 0
         self.color = "green"
         self.display_label = label
+        self.rad = 0
 
     def on_circle_draw(self, inches):
 
@@ -62,8 +63,9 @@ class MyDelegate(object):
 
     def check(self, number):
         print("Received: " + str(number))
-        message_to_display = "{}".format(number)
-        self.display_label.configure(text=message_to_display)
+        if number == 5:
+            self.rad = self.rad + 1
+        self.display_label.configure(text=self.rad)
 
 
 def main():
@@ -98,6 +100,10 @@ def main():
     pc_delegate = MyDelegate(canvas, button_message)
     mqtt_client = com.MqttClient(pc_delegate)
     mqtt_client.connect_to_ev3()
+
+    check_button = ttk.Button(radiation_frame, text="CHECK")
+    check_button.grid(row=0, column=0)
+    check_button['command'] = lambda: check_command(mqtt_client)
 
     inches_label = ttk.Label(control_frame, text="Inches")
     inches_label.grid(row=0, column=2)
@@ -198,6 +204,9 @@ def send_back(mqtt_client, inches, speed, delegate):
 def send_stop(mqtt_client):
     print("Stop")
     mqtt_client.send_message("drive_forever", [0, 0])
+
+def check_command(mqtt):
+    mqtt.send_message("check_rad")
 
 
 # Quit and Exit button callbacks
