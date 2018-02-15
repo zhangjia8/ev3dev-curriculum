@@ -9,6 +9,10 @@ class MyDelegate(object):
     def __init__(self):
         self.running = True
 
+    def check_rad(self):
+        print("Received")
+
+
 
 def main():
     robot = robo.Snatch3r()

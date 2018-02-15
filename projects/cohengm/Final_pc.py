@@ -83,12 +83,12 @@ def main():
     mqtt_draw = com.MqttClient(my_delegate)
     mqtt_draw.connect("draw", "draw")
 
-    tkinter.Button(radiation_frame, text="CHECK", command=countup, fg="red", bg="white").grid()
+    count_button = tkinter.Button(radiation_frame, text="CHECK", fg="red", bg="white")
+    count_button.grid()
+    count_button['command'] = lambda: send_check(mqtt_client)
 
     radiation_label = ttk.Label(radiation_frame, text="Radiation Count")
-    radiation_count = ttk.Label(radiation_frame, textvariable=count)
     radiation_label.grid()
-    radiation_count.grid()
 
     mqtt_client = com.MqttClient()
     mqtt_client.connect_to_ev3()
@@ -192,6 +192,11 @@ def send_back(mqtt_client, inches, speed, delegate):
 def send_stop(mqtt_client):
     print("Stop")
     mqtt_client.send_message("drive_forever", [0, 0])
+
+
+def send_check(mqtt_client):
+    print("Sending Check")
+    mqtt_client.send_message("check_rad")
 
 
 # Quit and Exit button callbacks
