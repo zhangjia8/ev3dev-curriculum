@@ -27,7 +27,6 @@ def main():
 
     while True:
         if my_delegate.rad:
-            time.sleep(2)
             if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
                 ev3.Sound.speak("Found Radiation").wait()
                 mqtt_client.send_message("check", [5])
@@ -35,7 +34,8 @@ def main():
             if robot.color_sensor.color == ev3.ColorSensor.COLOR_RED:
                 ev3.Sound.speak("DETH").wait()
                 robot.turn_degrees(360, 400)
-            time.sleep(2)
+            else:
+                ev3.Sound.speak("No Radiation").wait()
 
 
 main()
