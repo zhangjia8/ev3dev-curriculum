@@ -7,6 +7,59 @@ from tkinter import ttk
 import mqtt_remote_method_calls as com
 
 
+class MyDelegate(object):
+
+    def __init__(self, canvas):
+        self.canvas = canvas
+        self.xold = 400
+        self.yold = 250
+        self.turns = 0
+        self.color = "green"
+
+    def on_circle_draw(self, inches):
+
+        if self.turns == -3:
+            self.turns = 1
+        if self.turns == 3:
+            self.turns = -1
+
+        x = 0
+        y = 0
+
+        if self.turns % 3 == 0:
+            x = self.xold
+            y = self.yold - inches*10
+        if self.turns % 3 == 1:
+            x = self.xold + inches*10
+            y = self.yold
+        if self.turns % 3 == 2:
+            x = self.xold - inches*10
+            y = self.yold
+        if self.turns == 2 or self.turns == -2:
+            x = self.xold
+            y = self.yold + inches*10
+
+        self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=self.color, width=3)
+
+        self.xold = x
+        self.yold = y
+
+    def turn_right(self):
+        self.turns = self.turns + 1
+
+    def turn_left(self):
+        self.turns = self.turns - 1
+
+    def changeblue(self):
+        self.color = "blue"
+
+    def changegreen(self):
+        self.color = "green"
+
+    def changeyellow(self):
+        self.color = "yellow"
+
+
 def main():
     root = tkinter.Tk()
     root.title("Find The Radiation")
@@ -29,11 +82,6 @@ def main():
     my_delegate = MyDelegate(canvas)
     mqtt_draw = com.MqttClient(my_delegate)
     mqtt_draw.connect("draw", "draw")
-
-    count = tkinter.IntVar()
-
-    def countup():
-        count.set(my_delegate.radiation_count)
 
     tkinter.Button(radiation_frame, text="CHECK", command=countup, fg="red", bg="white").grid()
 
@@ -61,9 +109,6 @@ def main():
 
     def yellower():
         mqtt_draw.send_message("changeyellow")
-
-    def found():
-        print("YEET")
 
     radiation_color = ttk.Checkbutton
     blue = ttk.Checkbutton(control_frame, text='Blue Sensor', command=bluer,
@@ -156,63 +201,6 @@ def quit_program(mqtt_client, shutdown_ev3):
         mqtt_client.send_message("shutdown")
     mqtt_client.close()
     exit()
-
-
-class MyDelegate(object):
-
-    def __init__(self, canvas):
-        self.canvas = canvas
-        self.radiation_count = 0
-        self.xold = 400
-        self.yold = 250
-        self.turns = 0
-        self.color = "green"
-
-    def on_circle_draw(self, inches):
-
-        if self.turns == -3:
-            self.turns = 1
-        if self.turns == 3:
-            self.turns = -1
-
-        x = 0
-        y = 0
-
-        if self.turns % 3 == 0:
-            x = self.xold
-            y = self.yold - inches*10
-        if self.turns % 3 == 1:
-            x = self.xold + inches*10
-            y = self.yold
-        if self.turns % 3 == 2:
-            x = self.xold - inches*10
-            y = self.yold
-        if self.turns == 2 or self.turns == -2:
-            x = self.xold
-            y = self.yold + inches*10
-
-        self.canvas.create_oval(x - 10, y - 10, x + 10, y + 10, fill=self.color, width=3)
-
-        self.xold = x
-        self.yold = y
-
-    def turn_right(self):
-        self.turns = self.turns + 1
-
-    def turn_left(self):
-        self.turns = self.turns - 1
-
-    def found(self):
-        self.radiation_count = self.radiation_count + 1
-
-    def changeblue(self):
-        self.color = "blue"
-
-    def changegreen(self):
-        self.color = "green"
-
-    def changeyellow(self):
-        self.color = "yellow"
 
 
 main()
