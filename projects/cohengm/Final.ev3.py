@@ -25,7 +25,9 @@ def main():
     mqtt_client = com.MqttClient(my_delegate)
     mqtt_client.connect_to_pc()
 
-    while True:
+    btn = ev3.Button()
+
+    while my_delegate.running:
         if my_delegate.rad:
             if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
                 ev3.Sound.speak("Found Radiation").wait()
@@ -36,6 +38,10 @@ def main():
                 robot.turn_degrees(360, 400)
             else:
                 ev3.Sound.speak("No Radiation").wait()
+        if btn.backspace:
+            my_delegate.running = False
+
+    ev3.Sound.speak("Goodbye").wait()
 
 
 main()
