@@ -15,7 +15,7 @@ class DataContainer(object):
 def main():
     print("--------------------------------------------")
     print("Finding something")
-    print(" - Find the beacon first")
+    print(" - Find the remote control first")
     print(" - Use IR remote channel 1 to drive around")
     print(" - Use IR remote channel 2 for the arm")
     print(" - Find the target by")
