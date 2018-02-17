@@ -128,7 +128,7 @@ class Snatch3r(object):
 
     def seek_beacon(self):
         """seek the beacon"""
-        beacon_seeker = ev3.BeaconSeeker(channel=1)
+        beacon_seeker = ev3.BeaconSeeker(channel=3)
 
         forward_speed = 300
         turn_speed = 100
@@ -162,8 +162,12 @@ class Snatch3r(object):
                         self.drive_forever(turn_speed, -turn_speed)
                         print("Adjusting heading: ", current_heading)
                 elif math.fabs(current_heading) > 10:
-                    self.drive_forever(-turn_speed, turn_speed)
-                    print("Spin to fix the heading: ", current_heading)
+                    if current_heading < 0:
+                        self.drive_forever(-turn_speed, turn_speed)
+                        print("Spin to fix the heading: ", current_heading)
+                    elif current_heading > 0:
+                        self.drive_forever(turn_speed, -turn_speed)
+                        print("Spin to fix the heading: ", current_heading)
 
             time.sleep(0.2)
 
