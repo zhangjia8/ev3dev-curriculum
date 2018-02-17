@@ -4,18 +4,45 @@ import ev3dev.ev3 as ev3
 import time
 
 
+class MyDelegate(object):
+
+    def __init__(self):
+        self.running = True
+        self.rad = False
+
+    def check_rad(self):
+        self.rad = True
+        time.sleep(0.1)
+        self.rad = False
+
+
 def main():
     robot = robo.Snatch3r()
-    mqtt_client = com.MqttClient(robot)
+    mqtt_robot = com.MqttClient(robot)
+    mqtt_robot.connect_to_pc()
+
+    my_delegate = MyDelegate()
+    mqtt_client = com.MqttClient(my_delegate)
     mqtt_client.connect_to_pc()
 
-    ev3.Sound.beep()
+    btn = ev3.Button()
 
-    # while robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
-    #     robot.drive_forever(0, 0)
-    #     ev3.Sound.speak("Found Bomb").wait()
+    while my_delegate.running:
+        if my_delegate.rad:
+            if robot.color_sensor.color == ev3.ColorSensor.COLOR_WHITE:
+                ev3.Sound.speak("Found Radiation").wait()
+                mqtt_client.send_message("check", [5])
+                robot.arm_calibration()
 
-    robot.loop_forever()
+            if robot.color_sensor.color == ev3.ColorSensor.COLOR_RED:
+                ev3.Sound.speak("DETH").wait()
+                robot.turn_degrees(360, 400)
+            else:
+                ev3.Sound.speak("No Radiation").wait()
+        if btn.backspace:
+            my_delegate.running = False
+
+    ev3.Sound.speak("Goodbye").wait()
 
 
 main()
