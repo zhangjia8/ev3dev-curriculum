@@ -15,7 +15,7 @@ class DataContainer(object):
 def main():
     print("--------------------------------------------")
     print("Finding something")
-    print(" - Find the beacon first")
+    print(" - Find the remote control first")
     print(" - Use IR remote channel 1 to drive around")
     print(" - Use IR remote channel 2 for the arm")
     print(" - Find the target by")
@@ -75,10 +75,6 @@ def main():
         height = robot.pixy.value(4)
         print("X={},Y={},Width={},Height={}".format(x, y, width, height))
         mqtt_client.send_message("on_rectangle_update", [x, y, width, height])
-
-        if robot.ir_sensor.proximity < 5:
-            robot.stop()
-            ev3.Sound.speak("We are under attack!").wait()
 
     mqtt_client.close()
     print("Mission Complete.")

@@ -27,7 +27,7 @@ def main():
     mqtt_client.connect_to_pc()
 
     robot = robo.Snatch3r()
-    robot.pixy.mode = "SIG1"
+    robot.pixy.mode = "SIG2"
 
     while not robot.touch_sensor.is_pressed:
 
