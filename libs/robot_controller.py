@@ -57,20 +57,11 @@ class Snatch3r(object):
 
         degrees = degrees_to_turn * 4.5
         speed = turn_speed_sp
-        if degrees > 0:
-            self.left_motor.run_to_rel_pos(position_sp=-degrees, speed_sp=speed,
-                                           stop_action=ev3.Motor.STOP_ACTION_BRAKE)
-            self.right_motor.run_to_rel_pos(position_sp=degrees, speed_sp=speed,
-                                            stop_action=ev3.Motor.STOP_ACTION_BRAKE)
-            self.right_motor.wait_while(ev3.Motor.STATE_RUNNING)
-            self.left_motor.wait_while(ev3.Motor.STATE_RUNNING)
-        if degrees < 0:
-            self.left_motor.run_to_rel_pos(position_sp=degrees, speed_sp=speed,
-                                           stop_action=ev3.Motor.STOP_ACTION_BRAKE)
-            self.right_motor.run_to_rel_pos(position_sp=-degrees, speed_sp=speed,
-                                            stop_action=ev3.Motor.STOP_ACTION_BRAKE)
-            self.right_motor.wait_while(ev3.Motor.STATE_RUNNING)
-            self.left_motor.wait_while(ev3.Motor.STATE_RUNNING)
+        print("Degrees: " +  str(degrees))
+        self.left_motor.run_to_rel_pos(position_sp= -degrees, speed_sp=speed)
+        self.right_motor.run_to_rel_pos(position_sp= degrees, speed_sp=-speed)
+        self.right_motor.wait_while(self.left_motor.STATE_RUNNING)
+        self.left_motor.wait_while(self.right_motor.STATE_RUNNING)
 
     def arm_calibration(self):
         """
@@ -89,6 +80,9 @@ class Snatch3r(object):
         ev3.Sound.beep().wait()
 
         self.arm_motor.position = 0  # Calibrate the down position as 0 (this line is correct as is).
+
+    def read_q(self, question):
+        ev3.Sound.speak(question).wait()
 
     def arm_up(self):
         """Moves the Snatch3r arm to the up position."""
